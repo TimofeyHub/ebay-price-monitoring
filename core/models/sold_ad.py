@@ -1,7 +1,13 @@
+from typing import List, TYPE_CHECKING
+
 from sqlalchemy import String, Integer, Text, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+from .collection import collection_table
+
+if TYPE_CHECKING:
+    from .scale_model import ScaleModel
 
 
 class SoldAd(Base):
@@ -12,4 +18,7 @@ class SoldAd(Base):
     sold_date: Mapped[str] = mapped_column(String(100))
     price: Mapped[int] = mapped_column(Integer())
     ebay_link: Mapped[str] = mapped_column(Text())
-    id_model: Mapped[int] = mapped_column(ForeignKey("scale_model.id"))
+    sold_ad: Mapped[List["ScaleModel"]] = relationship(
+        secondary=collection_table,
+        back_populates="sold_ad",
+    )
