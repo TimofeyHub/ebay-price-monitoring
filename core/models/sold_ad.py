@@ -18,7 +18,7 @@ class SoldAd(Base):
     sold_date: Mapped[str] = mapped_column(String(100))
     price: Mapped[int] = mapped_column(Integer())
     ebay_link: Mapped[str] = mapped_column(Text())
-    sold_ad: Mapped[List["ScaleModel"]] = relationship(
+    scale_model: Mapped[List["ScaleModel"]] = relationship(
         secondary=collection_table,
         back_populates="sold_ad",
     )

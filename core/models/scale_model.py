@@ -15,7 +15,12 @@ class ScaleModel(Base):
     __tablename__ = "scale_model"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    first_name: Mapped[str] = mapped_column(String(50), nullable=True)
+    first_name: Mapped[str] = mapped_column(
+        String(50),
+        nullable=True,
+        default="",
+        server_default="",
+    )
     second_name: Mapped[str] = mapped_column(String(50))
     year: Mapped[int] = mapped_column(Integer())
     grand_prix: Mapped[str] = mapped_column(String(50))
