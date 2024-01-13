@@ -1,11 +1,22 @@
-from sqlalchemy import Table, Column, ForeignKey, Integer
+from typing import List, TYPE_CHECKING
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+from .collection_and_scale_model import collection_and_scale_model_association
+from .scale_model import ScaleModel
 
-collection_table = Table(
-    "collection",
-    Base.metadata,
-    Column("id", Integer, primary_key=True),
-    Column("scale_model_id", ForeignKey("scale_model.id"), nullable=False),
-    Column("sold_ad_id", ForeignKey("sold_ad.id"), nullable=False),
-)
+if TYPE_CHECKING:
+    from .user import User
+
+
+class Collection(Base):
+    __tablename__ = "collection"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    user: Mapped["User"] = relationship(back_populates="collection")
+    scale_models: Mapped[List["ScaleModel"]] = relationship(
+        secondary=collection_and_scale_model_association,
+        back_populates="collections",
+    )

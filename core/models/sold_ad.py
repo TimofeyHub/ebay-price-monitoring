@@ -4,7 +4,7 @@ from sqlalchemy import String, Integer, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
-from .collection import collection_table
+from .scale_model_and_ad import scale_model_and_ad_association
 
 if TYPE_CHECKING:
     from .scale_model import ScaleModel
@@ -19,6 +19,6 @@ class SoldAd(Base):
     price: Mapped[int] = mapped_column(Integer())
     ebay_link: Mapped[str] = mapped_column(Text())
     scale_model: Mapped[List["ScaleModel"]] = relationship(
-        secondary=collection_table,
-        back_populates="sold_ad",
+        secondary=scale_model_and_ad_association,
+        back_populates="sold_ads",
     )
