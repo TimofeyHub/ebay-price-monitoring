@@ -5,7 +5,7 @@ __all__ = [
     "DatabaseHelper",
     "db_helper",
     "collection_table",
-    "wishlist",
+    "wishlist_table",
 ]
 
 from .base import Base
