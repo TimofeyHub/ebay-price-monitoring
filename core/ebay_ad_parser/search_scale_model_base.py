@@ -1,16 +1,12 @@
-from pydantic import BaseModel
+from . import constants
+from api_v1.scale_model.schemas import ScaleModelBaseSchema
 
-import constants
 
-
-class SearchScaleModelInfo(BaseModel):
-    keywords: str
-    brand: str
-    base_url: str = constants.F1_SEARCH_BASE_URL
-    scale: int = 43
-    category: int = constants.F1_model_ebay_category
-    ad_status: int = constants.AD_COMPLETE_STATUS
-    item_status: int = constants.ITEM_SOLD_STATUS
+class SearchScaleModelInfo(ScaleModelBaseSchema):
+    base_url: str | None = constants.F1_SEARCH_BASE_URL
+    category: int | None = constants.F1_model_ebay_category
+    ad_status: int | None = constants.AD_COMPLETE_STATUS
+    item_status: int | None = constants.ITEM_SOLD_STATUS
 
 
 def create_search_url(search_info: SearchScaleModelInfo) -> str:

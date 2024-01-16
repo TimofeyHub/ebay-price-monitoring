@@ -1,16 +1,16 @@
 import asyncio
 
-import search_url_base
+import search_scale_model_base
 import html_parser
 
 
 async def main():
-    ad = search_url_base.SearchUrlInfo(
+    ad = search_scale_model_base.SearchScaleModelInfo(
         keywords="bottas 2023",
         brand="Spark",
         scale=43,
     )
-    link = search_url_base.create_search_url(search_info=ad)
+    link = search_scale_model_base.create_search_url(search_info=ad)
     ads = await html_parser.get_sold_ebay_ad(link)
     for ad in ads:
         print(ad.id)

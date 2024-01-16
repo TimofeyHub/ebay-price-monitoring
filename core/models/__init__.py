@@ -18,6 +18,7 @@ from .db_helper import DatabaseHelper, db_helper
 from .scale_model import ScaleModel
 from .scale_model_and_ad import scale_model_and_ad_association
 from .sold_ad import SoldAd
-from .user import User
+
+# from .user import User
 from .wishlist import Wishlist
 from .wishlist_and_scale_model import wishlist_and_scale_model_association

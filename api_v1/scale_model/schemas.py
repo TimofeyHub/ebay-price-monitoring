@@ -2,10 +2,8 @@ from pydantic import BaseModel, ConfigDict
 
 
 class ScaleModelBaseSchema(BaseModel):
-    first_name: str
-    second_name: str
+    keywords: str
     year: int
-    grand_prix: str
     scale: str
     brand: str
 
@@ -20,9 +18,7 @@ class ScaleModelSchema(ScaleModelBaseSchema):
 
 
 class ScaleModelUpdateSchema(ScaleModelBaseSchema):
-    first_name: str | None = None
-    second_name: str | None = None
+    keywords: str | None = None
     year: int | None = None
-    grand_prix: str | None = None
     scale: str | None = None
     brand: str | None = None
