@@ -1,6 +1,6 @@
 import asyncio
 
-import search_scale_model_base
+import create_search_url
 import html_parser
 
 

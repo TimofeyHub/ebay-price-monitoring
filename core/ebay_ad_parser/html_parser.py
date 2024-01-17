@@ -50,9 +50,12 @@ async def get_sold_ebay_ad(search_url: str) -> list[EbayAdInfo] | None:
                 )
                 price = round(float(price))
 
-                date_pattern = r"\b\d{1,2}\s(?:янв|фев|мар|апр|май|июн|июл|авг|сен|окт|нояб|дек)\.\s\d{4}\b"
+                ru_date_pattern = r"\b\d{1,2}\s(?:янв|фев|мар|апр|май|июн|июл|авг|сен|окт|нояб|дек)\.\s\d{4}\b"
                 raw_date = str(ad_base_soup.find("span", class_="POSITIVE"))
-                sold_date = re.findall(date_pattern, raw_date)[0]
+                print(raw_date)
+                sold_date = re.findall(ru_date_pattern, raw_date, flags=re.IGNORECASE)[
+                    0
+                ]
                 ad = EbayAdInfo(
                     id=ad_id,
                     price=price,

@@ -1,1 +1,1 @@
-from .search_scale_model_base import SearchScaleModelInfo, create_search_url
+from .search_url import create_search_url
