@@ -6,6 +6,7 @@ class SoldAdBaseSchema(BaseModel):
     sold_date: str
     price: int
     ebay_link: str
+    scale_model_id: int
 
 
 class SoldAdSchema(SoldAdBaseSchema):

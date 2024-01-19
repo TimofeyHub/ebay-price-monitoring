@@ -35,3 +35,38 @@ async def add_scale_model_in_collection(
         collection_id=1,
         activate_ebay_search=True,
     )
+
+
+@router.post("/update_ads")
+async def update_ads_by_scale_model_id(
+    scale_model_id: int,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    return await crud.update_ads_by_scale_model_id(
+        session=session,
+        scale_model_id=scale_model_id,
+    )
+
+
+@router.post("/update_all_collection")
+async def update_all_collection(
+    collection_id: int = 1,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    return await crud.update_all_collection(
+        session=session,
+        collection_id=collection_id,
+    )
+
+
+@router.delete("/delete_scale_model")
+async def delete_scale_model_from_collection_by_id(
+    collection_id: int = 1,
+    scale_model_id: int = 1,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    return await crud.delete_scale_model_from_collection_by_id(
+        collection_id=collection_id,
+        scale_model_id=scale_model_id,
+        session=session,
+    )

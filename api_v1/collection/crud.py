@@ -3,7 +3,7 @@ from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from api_v1.scale_model.crud import create_scale_model
+from api_v1.scale_model.crud import create_scale_model, get_scale_model
 from api_v1.scale_model.schemas import ScaleModelCreateSchema
 from api_v1.sold_ad.crud import create_sold_ad
 from api_v1.sold_ad.schemas import SoldAdCreateSchema
@@ -19,7 +19,7 @@ async def add_scale_model_in_collection(
     activate_ebay_search: bool,
 ) -> None:
     # Временная конструкция для тестирования функции
-    stmt = select(Collection).where(Collection.id == 1)
+    stmt = select(Collection).where(Collection.id == collection_id)
     result: Result = await session.execute(stmt)
     collection = result.scalars().first()
     print(collection)
@@ -62,6 +62,7 @@ async def add_scale_model_in_collection(
                 sold_date=ad.sold_date,
                 price=ad.price,
                 ebay_link=ad.ad_link,
+                scale_model_id=new_scale_model.id,
             )
             new_ad = await create_sold_ad(session=session, sold_ad_info=sold_ad_info)
             model_for_adding_ads.sold_ads.append(new_ad)
@@ -82,19 +83,87 @@ async def get_all_models_from_collection(
 
 async def get_all_ads_by_scale_model_id(
     session: AsyncSession,
-    model_id: int,
+    scale_model_id: int,
 ):
     stmt = (
         select(SoldAd)
         .options(selectinload(SoldAd.scale_model))
-        .where(ScaleModel.id == model_id)
+        .where(ScaleModel.id == scale_model_id)
     )
     result = await session.scalars(stmt)
     return list(result)
 
 
-async def update_all_ads_by_scale_model_id(
+async def update_ads_by_scale_model_id(
     session: AsyncSession,
-    model_id: int,
+    scale_model_id: int,
 ):
-    pass
+    # Получаем модель
+    stmt = (
+        select(ScaleModel)
+        .where(ScaleModel.id == scale_model_id)
+        .options(selectinload(ScaleModel.sold_ads))
+    )
+    scale_mode_result = await session.execute(stmt)
+    scale_model = scale_mode_result.scalars().first()
+    print(scale_model)
+
+    # Получаем все ebay_id объявлений
+    stmt = select(SoldAd.id_ebay).where(SoldAd.scale_model_id == scale_model_id)
+    ids_ebay_result = await session.execute(stmt)
+    id_ebay_list = ids_ebay_result.scalars().all()
+
+    # Получаем инфу об объявлениях и записываем их в табицу объявлений
+    search_url = create_search_url(scale_model)
+    ad_list = await get_sold_ebay_ad(search_url)
+
+    # Добавляем новые объявления
+    for ad in ad_list:
+        if ad.id not in id_ebay_list:
+            new_ad_info = SoldAdCreateSchema(
+                id_ebay=ad.id,
+                sold_date=ad.sold_date,
+                price=ad.price,
+                ebay_link=ad.ad_link,
+                scale_model_id=scale_model_id,
+            )
+            new_ad = await create_sold_ad(
+                session=session,
+                sold_ad_info=new_ad_info,
+            )
+            scale_model.sold_ads.append(new_ad)
+
+
+async def update_all_collection(
+    session: AsyncSession,
+    collection_id: int,
+):
+    # Получаем все модели из коллекции
+    stmt = (
+        select(Collection)
+        .where(Collection.id == collection_id)
+        .options(selectinload(Collection.scale_models))
+    )
+    result = await session.execute(stmt)
+    collection = result.scalars().first()
+
+    for model in collection.scale_models:
+        await update_ads_by_scale_model_id(session=session, scale_model_id=model.id)
+
+
+async def delete_scale_model_from_collection_by_id(
+    session: AsyncSession,
+    collection_id: int,
+    scale_model_id: int,
+):
+    stmt = (
+        select(Collection)
+        .where(Collection.id == collection_id)
+        .options(selectinload(Collection.scale_models))
+    )
+    result = await session.execute(stmt)
+    collection = result.scalars().first()
+
+    scale_model = await get_scale_model(session=session, scale_model_id=scale_model_id)
+    collection.scale_models.remove(scale_model)
+    await session.commit()
