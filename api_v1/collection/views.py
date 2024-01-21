@@ -6,51 +6,40 @@ from api_v1.scale_model.schemas import ScaleModelCreateSchema, ScaleModelSchema
 from api_v1.sold_ad.schemas import SoldAdSchema
 from . import crud
 
+TEST_COLLECTION_ID = 1
+
+
 router = APIRouter(tags=["Collection"])
 
 
-@router.get("/", response_model=list[ScaleModelSchema])
-async def get_all_scale_models(
+@router.get("/{collection_id}", response_model=list[ScaleModelSchema])
+async def get_all_scale_models_by_collection_id(
     session: AsyncSession = Depends(db_helper.session_dependency),
+    collection_id: int = TEST_COLLECTION_ID,
 ):
-    return await crud.get_all_models_from_collection(session=session, collection_id=1)
+    return await crud.get_all_scale_models_by_collection_id(
+        session=session,
+        collection_id=collection_id,
+    )
 
 
-@router.get("/ads", response_model=list[SoldAdSchema])
-async def get_all_ads_by_model_id(
-    model_id: int,
-    session: AsyncSession = Depends(db_helper.session_dependency),
-):
-    return await crud.get_all_ads_by_scale_model_id(session=session, model_id=1)
-
-
-@router.post("/")
+@router.post("/{collection_id}/scale_model/add")
 async def add_scale_model_in_collection(
     scale_model_info: ScaleModelCreateSchema,
+    collection_id: int = TEST_COLLECTION_ID,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     return await crud.add_scale_model_in_collection(
         session=session,
         scale_model_info=scale_model_info,
-        collection_id=1,
+        collection_id=collection_id,
         activate_ebay_search=True,
     )
 
 
-@router.post("/update_ads")
-async def update_ads_by_scale_model_id(
-    scale_model_id: int,
-    session: AsyncSession = Depends(db_helper.session_dependency),
-):
-    return await crud.update_ads_by_scale_model_id(
-        session=session,
-        scale_model_id=scale_model_id,
-    )
-
-
-@router.post("/update_all_collection")
+@router.patch("/{collection_id}/update_all")
 async def update_all_collection(
-    collection_id: int = 1,
+    collection_id: int = TEST_COLLECTION_ID,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     return await crud.update_all_collection(
@@ -59,10 +48,10 @@ async def update_all_collection(
     )
 
 
-@router.delete("/delete_scale_model")
+@router.delete("/{collection_id}/scale_model/delete_from_collection")
 async def delete_scale_model_from_collection_by_id(
-    collection_id: int = 1,
-    scale_model_id: int = 1,
+    scale_model_id: int,
+    collection_id: int = TEST_COLLECTION_ID,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     return await crud.delete_scale_model_from_collection_by_id(

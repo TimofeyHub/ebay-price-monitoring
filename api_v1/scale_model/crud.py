@@ -1,8 +1,12 @@
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.engine import Result
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
-from core.models import ScaleModel
+from api_v1.sold_ad.schemas import SoldAdCreateSchema
+from api_v1.sold_ad.views import create_sold_ad
+from core.ebay_ad_parser import create_search_url, get_sold_ebay_ad
+from core.models import ScaleModel, SoldAd
 from .schemas import ScaleModelCreateSchema, ScaleModelUpdateSchema
 
 
@@ -47,3 +51,55 @@ async def delete_scale_model(
 ) -> None:
     await session.delete(scale_model)
     await session.commit()
+
+
+async def update_ads_by_scale_model_id(
+    session: AsyncSession,
+    scale_model_id: int,
+):
+    # Получаем модель
+    stmt = (
+        select(ScaleModel)
+        .where(ScaleModel.id == scale_model_id)
+        .options(selectinload(ScaleModel.sold_ads))
+    )
+    scale_mode_result = await session.execute(stmt)
+    scale_model = scale_mode_result.scalars().first()
+
+    # Получаем все ebay_id объявлений
+    stmt = select(SoldAd.id_ebay).where(SoldAd.scale_model_id == scale_model_id)
+    ids_ebay_result = await session.execute(stmt)
+    id_ebay_list = ids_ebay_result.scalars().all()
+
+    # Получаем инфу об объявлениях и записываем их в табицу объявлений
+    search_url = create_search_url(scale_model)
+    ad_list = await get_sold_ebay_ad(search_url)
+
+    # Добавляем новые объявления
+    for ad in ad_list:
+        if ad.id not in id_ebay_list:
+            new_ad_info = SoldAdCreateSchema(
+                id_ebay=ad.id,
+                sold_date=ad.sold_date,
+                price=ad.price,
+                ebay_link=ad.ad_link,
+                scale_model_id=scale_model_id,
+            )
+            new_ad = await create_sold_ad(
+                session=session,
+                sold_ad_info=new_ad_info,
+            )
+            scale_model.sold_ads.append(new_ad)
+
+
+async def get_all_ads_by_scale_model_id(
+    session: AsyncSession,
+    scale_model_id: int,
+):
+    stmt = (
+        select(SoldAd)
+        .options(selectinload(SoldAd.scale_model))
+        .where(ScaleModel.id == scale_model_id)
+    )
+    result = await session.scalars(stmt)
+    return list(result)
