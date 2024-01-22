@@ -9,11 +9,13 @@ __all__ = [
     "wishlist_and_scale_model_association",
     "Collection",
     "collection_and_scale_model_association",
+    "CollectionPrice",
 ]
 
 from .base import Base
 from .collection import Collection
 from .collection_and_scale_model import collection_and_scale_model_association
+from .collection_price import CollectionPrice
 from .db_helper import DatabaseHelper, db_helper
 from .scale_model import ScaleModel
 from .scale_model_and_ad import scale_model_and_ad_association

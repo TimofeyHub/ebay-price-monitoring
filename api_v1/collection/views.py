@@ -5,6 +5,7 @@ from core.models import db_helper
 from api_v1.scale_model.schemas import ScaleModelCreateSchema, ScaleModelSchema
 from api_v1.sold_ad.schemas import SoldAdSchema
 from . import crud
+from .collection_price.crud import calculate_collection_price_by_collection_id
 
 TEST_COLLECTION_ID = 1
 
@@ -58,4 +59,15 @@ async def delete_scale_model_from_collection_by_id(
         collection_id=collection_id,
         scale_model_id=scale_model_id,
         session=session,
+    )
+
+
+@router.get("/{collection_id}/price")
+async def get_collection_price(
+    collection_id=TEST_COLLECTION_ID,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    await calculate_collection_price_by_collection_id(
+        session=session,
+        collection_id=collection_id,
     )

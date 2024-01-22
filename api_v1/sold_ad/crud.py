@@ -2,8 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.ebay_ad_parser import get_sold_ebay_ad
-from core.models import SoldAd, ScaleModel
+from core.models import SoldAd
 from .schemas import SoldAdCreateSchema, SoldAdUpdateSchema
 
 
@@ -48,14 +47,3 @@ async def delete_scale_model(
 ) -> None:
     await session.delete(sold_ad)
     await session.commit()
-
-
-async def create_ads_from_url(
-    url: str,
-    scale_model: ScaleModel,
-    session: AsyncSession,
-):
-    ad_list = await get_sold_ebay_ad(url)
-    for sold_ad_info in ad_list:
-        new_ad = await create_sold_ad(session=session, sold_ad_info=sold_ad_info)
-        scale_model.sold_ads.append(new_ad)
