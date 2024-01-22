@@ -3,13 +3,13 @@ from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from api_v1.scale_model.crud import create_scale_model, get_scale_model
+from api_v1.scale_model.crud import (
+    create_scale_model,
+    get_scale_model,
+    update_ads_by_scale_model_id,
+)
 from api_v1.scale_model.schemas import ScaleModelCreateSchema
-from api_v1.sold_ad.crud import create_sold_ad
-from api_v1.sold_ad.schemas import SoldAdCreateSchema
-from core.ebay_ad_parser.html_parser import get_sold_ebay_ad
-from core.ebay_ad_parser.search_url import create_search_url
-from core.models import ScaleModel, Collection, SoldAd
+from core.models import ScaleModel, Collection
 
 
 async def add_scale_model_in_collection(
@@ -53,19 +53,10 @@ async def add_scale_model_in_collection(
             .where(ScaleModel.id == new_scale_model.id)
             .options(selectinload(ScaleModel.sold_ads))
         )
-        search_url = create_search_url(new_scale_model)
-        # Получаем инфу об объявлениях и записываем их в табицу объявлений
-        ad_list = await get_sold_ebay_ad(search_url)
-        for ad in ad_list:
-            sold_ad_info = SoldAdCreateSchema(
-                id_ebay=ad.id,
-                sold_date=ad.sold_date,
-                price=ad.price,
-                ebay_link=ad.ad_link,
-                scale_model_id=new_scale_model.id,
-            )
-            new_ad = await create_sold_ad(session=session, sold_ad_info=sold_ad_info)
-            model_for_adding_ads.sold_ads.append(new_ad)
+        await update_ads_by_scale_model_id(
+            session=session,
+            scale_model_id=model_for_adding_ads.id,
+        )
 
 
 async def get_all_scale_models_by_collection_id(

@@ -3,8 +3,7 @@ from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from api_v1.sold_ad.schemas import SoldAdCreateSchema
-from api_v1.sold_ad.views import create_sold_ad
+from api_v1.sold_ad.crud import create_sold_ad
 from core.ebay_ad_parser import create_search_url, get_sold_ebay_ad
 from core.models import ScaleModel, SoldAd
 from .schemas import ScaleModelCreateSchema, ScaleModelUpdateSchema
@@ -73,21 +72,17 @@ async def update_ads_by_scale_model_id(
 
     # Получаем инфу об объявлениях и записываем их в табицу объявлений
     search_url = create_search_url(scale_model)
-    ad_list = await get_sold_ebay_ad(search_url)
+    ad_list = await get_sold_ebay_ad(
+        search_url=search_url,
+        scale_model_id=scale_model.id,
+    )
 
     # Добавляем новые объявления
-    for ad in ad_list:
-        if ad.id not in id_ebay_list:
-            new_ad_info = SoldAdCreateSchema(
-                id_ebay=ad.id,
-                sold_date=ad.sold_date,
-                price=ad.price,
-                ebay_link=ad.ad_link,
-                scale_model_id=scale_model_id,
-            )
+    for ad_info in ad_list:
+        if ad_info.id_ebay not in id_ebay_list:
             new_ad = await create_sold_ad(
                 session=session,
-                sold_ad_info=new_ad_info,
+                sold_ad_info=ad_info,
             )
             scale_model.sold_ads.append(new_ad)
 

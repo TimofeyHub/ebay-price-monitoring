@@ -1,18 +1,26 @@
+import locale
 import re
+from datetime import datetime
 
 import aiohttp
 from bs4 import BeautifulSoup
-from pydantic import BaseModel
+
+from api_v1.sold_ad.schemas import SoldAdCreateSchema
 
 
-class EbayAdInfo(BaseModel):
-    id: str
-    price: int
-    sold_date: str
-    ad_link: str
+def ebay_ad_date_to_datetime(raw_date: str) -> datetime:
+    date_format = "%d %b. %Y"
+    locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
+    # Название ноября в ebay и питоне не совпадает
+    raw_date = raw_date.replace("нояб.", "ноя.")
+    sold_date = datetime.strptime(raw_date, date_format)
+    return sold_date
 
 
-async def get_sold_ebay_ad(search_url: str) -> list[EbayAdInfo] | None:
+async def get_sold_ebay_ad(
+    search_url: str,
+    scale_model_id: int,
+) -> list[SoldAdCreateSchema] | None:
     async with aiohttp.ClientSession() as session:
         async with session.get(search_url) as response:
             final_ad_list = []
@@ -55,12 +63,14 @@ async def get_sold_ebay_ad(search_url: str) -> list[EbayAdInfo] | None:
                 sold_date = re.findall(ru_date_pattern, raw_date, flags=re.IGNORECASE)[
                     0
                 ]
-                ad = EbayAdInfo(
-                    id=ad_id,
-                    price=price,
-                    sold_date=sold_date,
-                    ad_link=link,
-                )
 
+                ad = SoldAdCreateSchema(
+                    id_ebay=ad_id,
+                    raw_sold_date=sold_date,
+                    sold_date=ebay_ad_date_to_datetime(sold_date),
+                    price=price,
+                    ebay_link=link,
+                    scale_model_id=scale_model_id,
+                )
                 final_ad_list.append(ad)
             return final_ad_list

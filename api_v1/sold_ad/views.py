@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import db_helper, SoldAd
@@ -22,12 +22,12 @@ async def get_all_sold_ads(
     status_code=status.HTTP_201_CREATED,
 )
 async def create_sold_ad(
-    old_ad_info: SoldAdCreateSchema,
+    sold_ad_info: SoldAdCreateSchema,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     return await crud.create_sold_ad(
         session=session,
-        sold_ad_info=old_ad_info,
+        sold_ad_info=sold_ad_info,
     )
 
 
