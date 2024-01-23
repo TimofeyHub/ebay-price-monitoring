@@ -1,13 +1,11 @@
-from typing import Dict
 import datetime
 
-from sqlalchemy import func, select, Result
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-
-from .schemas import CollectionPriceCreateSchema
+from sqlalchemy.sql import func
 
 from core.models import CollectionPrice, ScaleModel, Collection, SoldAd
+from .schemas import CollectionPriceCreateSchema
 
 
 async def create_collection_price(
@@ -23,23 +21,41 @@ async def create_collection_price(
 async def calculate_collection_price_by_collection_id(
     session: AsyncSession,
     collection_id: int,
-) -> None:
-    # stmt = (
-    #     select(ScaleModel.id, func.min(SoldAd.price), func.max(SoldAd.price))
-    #     .options(selectinload(ScaleModel.collections))
-    #     .options(selectinload(ScaleModel.sold_ads))
-    #     .where(Collection.id == collection_id)
-    #     .where(
-    #         SoldAd.sold_date.between(
-    #             datetime.datetime.utcnow() - datetime.timedelta(days=90),
-    #             datetime.datetime.utcnow(),
-    #         )
-    #     )
-    # )
-    row = (
+    calculate_interval: int = 90,
+) -> CollectionPrice:
+    get_scale_model_id = (
         select(ScaleModel.id)
-        .options(selectinload(ScaleModel.collections))
+        .join(Collection, ScaleModel.collections)
         .where(Collection.id == collection_id)
     )
-    result = await session.scalars(row)
-    print(result)
+
+    get_scale_models_min_max_prices = (
+        select(
+            func.min(SoldAd.price).label("min_price"),
+            func.max(SoldAd.price).label("max_price"),
+        )
+        .where(
+            SoldAd.scale_model_id.in_(get_scale_model_id),
+            SoldAd.sold_date.between(
+                datetime.datetime.utcnow()
+                - datetime.timedelta(days=calculate_interval),
+                datetime.datetime.utcnow(),
+            ),
+        )
+        .group_by(SoldAd.scale_model_id)
+    ).subquery()
+    collection_min_max_price = select(
+        func.sum(get_scale_models_min_max_prices.c.min_price),
+        func.sum(get_scale_models_min_max_prices.c.max_price),
+    )
+    result = await session.execute(collection_min_max_price)
+    min_max_prices = result.first()
+
+    return await create_collection_price(
+        session=session,
+        collection_price_info=CollectionPriceCreateSchema(
+            id_collection=collection_id,
+            min_price=min_max_prices[0],
+            max_price=min_max_prices[1],
+        ),
+    )
