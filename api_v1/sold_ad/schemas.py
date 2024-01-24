@@ -10,6 +10,7 @@ class SoldAdBaseSchema(BaseModel):
     price: int
     ebay_link: str
     scale_model_id: int
+    include_in_calculation: bool = True
 
 
 class SoldAdSchema(SoldAdBaseSchema):
