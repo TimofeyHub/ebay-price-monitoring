@@ -29,6 +29,6 @@ class SoldAd(Base):
     )
     scale_model_id: Mapped[int] = mapped_column(ForeignKey("scale_model.id"))
     scale_model: Mapped["ScaleModel"] = relationship(
-        secondary=scale_model_and_ad_association,
         back_populates="sold_ads",
+        passive_deletes=True,
     )
