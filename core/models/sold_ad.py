@@ -14,7 +14,7 @@ class SoldAd(Base):
     __tablename__ = "sold_ad"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    id_ebay: Mapped[str] = mapped_column(unique=True)
+    id_ebay: Mapped[str] = mapped_column(nullable=False)
     raw_sold_date: Mapped[str] = mapped_column(String(100))
     sold_date: Mapped[DateTime] = mapped_column(DateTime())
     price: Mapped[int] = mapped_column(Integer())
