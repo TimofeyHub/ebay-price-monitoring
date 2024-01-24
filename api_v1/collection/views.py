@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.models import db_helper
 from api_v1.scale_model.schemas import ScaleModelCreateSchema, ScaleModelSchema
-from api_v1.sold_ad.schemas import SoldAdSchema
+from core.models import db_helper
 from . import crud
 from .collection_price.crud import calculate_collection_price_by_collection_id
 

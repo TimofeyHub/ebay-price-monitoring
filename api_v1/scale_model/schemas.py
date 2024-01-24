@@ -6,6 +6,7 @@ class ScaleModelBaseSchema(BaseModel):
     year: int
     scale: str
     brand: str
+    search_url_created_by_user: str | None = None
 
 
 class ScaleModelCreateSchema(ScaleModelBaseSchema):

@@ -22,6 +22,7 @@ class ScaleModel(Base):
     year: Mapped[int] = mapped_column(Integer())
     scale: Mapped[str] = mapped_column(String(20))
     brand: Mapped[str] = mapped_column(String(25))
+    search_url_created_by_user: Mapped[str] = mapped_column(String(), nullable=True)
     sold_ads: Mapped[List["SoldAd"]] = relationship(
         secondary=scale_model_and_ad_association,
         back_populates="scale_model",
