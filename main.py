@@ -2,12 +2,11 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 
-from core.config import settings
+from core.config import settings, TEMPLATES
 from core.models import Base, db_helper
 from api_v1 import router as router_v1
 
 from fastapi import FastAPI, Request
-from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
 
@@ -23,12 +22,10 @@ app.include_router(router_v1, prefix=settings.api_v1_prefix)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-templates = Jinja2Templates(directory="static/templates")
-
 
 @app.get("/")
 async def hello_index(request: Request):
-    return templates.TemplateResponse(name="home.html", request=request)
+    return TEMPLATES.TemplateResponse(name="home.html", request=request)
 
 
 if __name__ == "__main__":
