@@ -3,22 +3,22 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>ScaleEye-большой брат вашей коллекции</title>
     <link href="{{ url_for('static', path = '/css/bootstrap.min.css') }}" rel="stylesheet">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">Navbar</a>
+  <a class="navbar-brand" href="/">ScaleEye</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
       <li class="nav-item active">
-        <a class="nav-link" href={{ url_for('get_all_scale_models_by_collection_id') }}>My collection </a>
+        <a class="nav-link" href={{ url_for('get_all_scale_models_by_collection_id') }}> Моя коллекция </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href={{ url_for('get_scale_model_add_form') }}>Add scale model</a>
+        <a class="nav-link" href={{ url_for('add_scale_model_in_collection') }}> Добавить модель </a>
       </li>
     </ul>
   </div>

@@ -60,7 +60,7 @@ async def delete_scale_model(
     await crud.delete_scale_model(session=session, scale_model=scale_model)
 
 
-@router.patch("/{scale_model_id}/update_ads")
+@router.patch("/{scale_model_id}/update_ads/")
 async def update_ads_by_scale_model_id(
     scale_model_id: int,
     session: AsyncSession = Depends(db_helper.session_dependency),
@@ -71,7 +71,7 @@ async def update_ads_by_scale_model_id(
     )
 
 
-@router.get("/{scale_model_id}/all_ads", response_model=list[SoldAdSchema])
+@router.get("/{scale_model_id}/all_ads/", response_model=list[SoldAdSchema])
 async def get_all_ads_by_scale_model_id(
     scale_model_id: int,
     session: AsyncSession = Depends(db_helper.session_dependency),

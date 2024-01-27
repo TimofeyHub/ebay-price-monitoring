@@ -1,4 +1,7 @@
+from typing import Annotated
+
 from pydantic import BaseModel, ConfigDict
+from fastapi import Form
 
 
 class ScaleModelBaseSchema(BaseModel):
@@ -10,7 +13,11 @@ class ScaleModelBaseSchema(BaseModel):
 
 
 class ScaleModelCreateSchema(ScaleModelBaseSchema):
-    pass
+    keywords: Annotated[str, Form()]
+    year: Annotated[int, Form()]
+    scale: Annotated[str, Form()]
+    brand: Annotated[str, Form()]
+    search_url_created_by_user: Annotated[str | None, Form()] = None
 
 
 class ScaleModelSchema(ScaleModelBaseSchema):
