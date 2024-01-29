@@ -37,6 +37,7 @@ async def add_scale_model_in_collection(
         year=scale_model_info.year,
         scale=scale_model_info.scale,
         brand=scale_model_info.brand,
+        search_url_created_by_user=scale_model_info.search_url_created_by_user,
     )
 
     new_scale_model = await create_scale_model(
@@ -65,7 +66,7 @@ async def get_all_scale_models_by_collection_id(
 ):
     stmt = (
         select(ScaleModel)
-        .options(selectinload(ScaleModel.collections))
+        .join(Collection.scale_models)
         .where(Collection.id == collection_id)
     )
     result = await session.scalars(stmt)

@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from api_v1.scale_model.schemas import (
     ScaleModelCreateSchema,
-    ScaleModelSchema,
 )
+from api_v1.scale_model.views import get_scale_model_by_id
 from core.config import TEMPLATES, settings
 from core.models import db_helper
 from . import crud
@@ -19,14 +19,23 @@ TEST_COLLECTION_ID = 1
 router = APIRouter(tags=["collection"])
 
 
-@router.get("/", response_model=list[ScaleModelSchema])
+@router.get("/")
 async def get_all_scale_models_by_collection_id(
+    request: Request,
     session: AsyncSession = Depends(db_helper.session_dependency),
     # collection_id: int = TEST_COLLECTION_ID,
 ):
-    return await crud.get_all_scale_models_by_collection_id(
+    scale_list = await crud.get_all_scale_models_by_collection_id(
         session=session,
         collection_id=TEST_COLLECTION_ID,
+    )
+
+    return TEMPLATES.TemplateResponse(
+        name="collection.html",
+        context={
+            "request": request,
+            "scale_list": scale_list,
+        },
     )
 
 
@@ -79,25 +88,40 @@ async def update_all_collection(
     )
 
 
-@router.delete("/scale_model/delete_from_collection/")
+@router.api_route("/scale_model/{scale_model_id}/delete/", methods=["GET", "POST"])
 async def delete_scale_model_from_collection_by_id(
     scale_model_id: int,
+    request: Request,
+    scale_model=Depends(get_scale_model_by_id),
     # collection_id: int = TEST_COLLECTION_ID,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    return await crud.delete_scale_model_from_collection_by_id(
-        collection_id=TEST_COLLECTION_ID,
-        scale_model_id=scale_model_id,
-        session=session,
-    )
+    if request.method == "GET":
+        return TEMPLATES.TemplateResponse(
+            name="scale_model_delete_confirmation.html",
+            context={
+                "request": request,
+                "scale_model": scale_model,
+            },
+        )
+    else:
+        await crud.delete_scale_model_from_collection_by_id(
+            collection_id=TEST_COLLECTION_ID,
+            scale_model_id=scale_model_id,
+            session=session,
+        )
+        return RedirectResponse(
+            url=f"{settings.api_v1_prefix}/collection/",
+            status_code=status.HTTP_302_FOUND,
+        )
 
 
-@router.get("/{collection_id}/price/")
+@router.get("/price/")
 async def get_collection_price(
-    collection_id=TEST_COLLECTION_ID,
+    # collection_id=TEST_COLLECTION_ID,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     await calculate_collection_price_by_collection_id(
         session=session,
-        collection_id=collection_id,
+        collection_id=TEST_COLLECTION_ID,
     )

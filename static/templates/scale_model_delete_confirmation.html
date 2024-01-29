@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h4> Вы уверены, что хотите удалить модель из коллекции?</h4>
+    <p>Название: {{ scale_model.keywords }}</p>
+    <p>Год: {{ scale_model.year }}</p>
+    <p>Масштаб: {{ scale_model.scale }}</p>
+    <p>Производитель: {{ scale_model.brand }}</p>
+    <form method="post">
+        <button type="submit" class="btn btn-danger" value="Submit">Да</button>
+    </form>
+    <br>
+    <a class="btn btn-primary" href="{{ url_for('get_all_scale_models_by_collection_id') }}" role="button">Вернуться в коллекцию</a>
+{% endblock %}
