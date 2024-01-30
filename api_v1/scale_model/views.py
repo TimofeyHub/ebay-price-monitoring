@@ -1,9 +1,10 @@
 from fastapi import APIRouter, status, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.models import db_helper, ScaleModel
-from core.config import TEMPLATES
 from api_v1.sold_ad.schemas import SoldAdSchema
+from core.config import TEMPLATES
+from core.models import db_helper, ScaleModel
+from core.price_visualization import build_scale_model_price_graph
 from . import crud
 from .dependecies import get_scale_model_by_id
 from .schemas import ScaleModelSchema, ScaleModelCreateSchema, ScaleModelUpdateSchema
@@ -83,11 +84,17 @@ async def get_all_ads_by_scale_model_id(
         scale_model_id=scale_model.id,
     )
 
+    graph_image_path = await build_scale_model_price_graph(
+        scale_model=scale_model,
+        ads_list=ads_list,
+    )
+
     return TEMPLATES.TemplateResponse(
         name="all_ads_of_scale_model.html",
         context={
             "request": request,
             "scale_model": scale_model,
             "ads_list": ads_list,
+            "graph_image_path": graph_image_path,
         },
     )
