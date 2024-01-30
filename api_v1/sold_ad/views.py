@@ -1,6 +1,8 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, Request
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.config import TEMPLATES, settings
 from core.models import db_helper, SoldAd
 from . import crud
 from .dependecies import get_sold_ad_by_id
@@ -51,9 +53,30 @@ async def update_sold_ad(
     )
 
 
-@router.delete("/{sold_ad_id}/", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_sold_ad(
+@router.api_route(
+    "/{sold_ad_id}/delete",
+    status_code=status.HTTP_204_NO_CONTENT,
+    methods=["GET", "POST"],
+)
+async def delete_sold_ad_by_id(
+    request: Request,
     sold_ad: SoldAd = Depends(get_sold_ad_by_id),
     session: AsyncSession = Depends(db_helper.session_dependency),
-) -> None:
-    await crud.delete_scale_model(session=session, sold_ad=sold_ad)
+):
+    if request.method == "GET":
+        return TEMPLATES.TemplateResponse(
+            name="ad_delete_confirmation.html",
+            context={
+                "request": request,
+                "sold_ad": sold_ad,
+            },
+        )
+    else:
+        await crud.delete_sold_ad(
+            session=session,
+            sold_ad=sold_ad,
+        )
+        return RedirectResponse(
+            url=f"{settings.api_v1_prefix}/scale-models/{sold_ad.scale_model_id}/all_ads",
+            status_code=status.HTTP_302_FOUND,
+        )

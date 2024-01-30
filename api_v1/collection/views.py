@@ -90,7 +90,6 @@ async def update_all_collection(
 
 @router.api_route("/scale_model/{scale_model_id}/delete/", methods=["GET", "POST"])
 async def delete_scale_model_from_collection_by_id(
-    scale_model_id: int,
     request: Request,
     scale_model=Depends(get_scale_model_by_id),
     # collection_id: int = TEST_COLLECTION_ID,
@@ -107,7 +106,7 @@ async def delete_scale_model_from_collection_by_id(
     else:
         await crud.delete_scale_model_from_collection_by_id(
             collection_id=TEST_COLLECTION_ID,
-            scale_model_id=scale_model_id,
+            scale_model_id=scale_model.id,
             session=session,
         )
         return RedirectResponse(

@@ -1,7 +1,8 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import db_helper, ScaleModel
+from core.config import TEMPLATES
 from api_v1.sold_ad.schemas import SoldAdSchema
 from . import crud
 from .dependecies import get_scale_model_by_id
@@ -73,10 +74,20 @@ async def update_ads_by_scale_model_id(
 
 @router.get("/{scale_model_id}/all_ads/", response_model=list[SoldAdSchema])
 async def get_all_ads_by_scale_model_id(
-    scale_model_id: int,
+    request: Request,
+    scale_model: ScaleModel = Depends(get_scale_model_by_id),
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    return await crud.get_all_ads_by_scale_model_id(
+    ads_list = await crud.get_all_ads_by_scale_model_id(
         session=session,
-        scale_model_id=scale_model_id,
+        scale_model_id=scale_model.id,
+    )
+
+    return TEMPLATES.TemplateResponse(
+        name="all_ads_of_scale_model.html",
+        context={
+            "request": request,
+            "scale_model": scale_model,
+            "ads_list": ads_list,
+        },
     )

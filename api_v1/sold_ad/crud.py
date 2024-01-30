@@ -41,7 +41,7 @@ async def update_sold_ad(
     return sold_ad
 
 
-async def delete_scale_model(
+async def delete_sold_ad(
     session: AsyncSession,
     sold_ad: SoldAd,
 ) -> None:

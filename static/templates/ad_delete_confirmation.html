@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h4> Вы уверены, что хотите удалить объявление?</h4>
+    <p>Ссылка: <a href="{{ sold_ad.ebay_link }}">перейти к объявлению</a></p>
+    <p>Цена продажи: {{ sold_ad.price }}</p>
+    <p>Дата продажи: {{ sold_ad.sold_date }}</p>
+    <form method="post">
+        <button type="submit" class="btn btn-danger" value="Submit">Да</button>
+    </form>
+    <br>
+    <a class="btn btn-primary" href="{{ url_for('get_all_ads_by_scale_model_id', scale_model_id=sold_ad.scale_model_id) }}" role="button">Вернуться к списку объявлений</a>
+{% endblock %}

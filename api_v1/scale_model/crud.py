@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, desc
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -93,8 +93,9 @@ async def get_all_ads_by_scale_model_id(
 ):
     stmt = (
         select(SoldAd)
-        .options(selectinload(SoldAd.scale_model))
+        .join(ScaleModel.sold_ads)
         .where(ScaleModel.id == scale_model_id)
+        .order_by(desc(SoldAd.sold_date))
     )
     result = await session.scalars(stmt)
     return list(result)

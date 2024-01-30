@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% if  ads_list %}
+        <table id="all_ads_table" border="2">
+        <thead>
+        <tr>
+            <th>Цена (руб.)</th>
+            <th>Дата продажи</th>
+            <th>Объявление на ebay</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for ad in ads_list %}
+            <tr>
+                <td>{{ ad.price }}</td>
+                <td>{{ ad.sold_date }}</td>
+                <td>
+                    <a href="{{ ad.ebay_link }}"> ссылка </a>
+                </td>
+                <td>
+                    <a href="{{ url_for('delete_sold_ad_by_id', sold_ad_id=ad.id) }}">
+                        удалить
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% else %}
+        <h4>Информация о продажах этой модели отсутствуют на данный момент</h4>
+    {% endif %}
+{% endblock %}
