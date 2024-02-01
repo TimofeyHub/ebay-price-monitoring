@@ -1,4 +1,7 @@
-from sqlalchemy import select, desc
+import datetime
+from typing import Dict
+
+from sqlalchemy import select, desc, func, update
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -99,3 +102,34 @@ async def get_all_ads_by_scale_model_id(
     )
     result = await session.scalars(stmt)
     return list(result)
+
+
+async def get_min_max_prices_by_scale_model_id(
+    session: AsyncSession,
+    scale_model_id_list: list[int],
+    calculation_interval_in_days: int = 90,
+):
+    stmt = (
+        select(ScaleModel.id, func.min(SoldAd.price), func.max(SoldAd.price))
+        .join(ScaleModel.sold_ads)
+        .where(
+            ScaleModel.id.in_(scale_model_id_list),
+            SoldAd.sold_date.between(
+                datetime.datetime.utcnow()
+                - datetime.timedelta(days=calculation_interval_in_days),
+                datetime.datetime.utcnow(),
+            ),
+        )
+        .group_by(ScaleModel.id)
+    )
+    result_dict = {}
+    result = list(await session.execute(stmt))
+
+    # Временная конструкция, убрать при достижении оптимального решения
+    for price_info in result:
+        result_dict[price_info[0]] = {
+            "min_price": price_info[1],
+            "max_price": price_info[2],
+        }
+
+    return result_dict

@@ -47,7 +47,7 @@ async def build_price_graph(
     plt.xlabel(graph_info.x_label)
     plt.ylabel(graph_info.y_label)
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
-    plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=5))
+    plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=30))
 
     if save_in_file:
         plt.savefig(graph_info.image_save_path)

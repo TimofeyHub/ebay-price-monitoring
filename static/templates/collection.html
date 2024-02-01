@@ -8,6 +8,8 @@
                 <th>Год</th>
                 <th>Масштаб</th>
                 <th>Производитель</th>
+                <th>Мин. цена (за 3 мес.)</th>
+                <th>Макс. цена(за 3 мес.)</th>
                 <th>Продажи</th>
                 <th>Действия</th>
             </tr>
@@ -19,6 +21,8 @@
                         <td>{{ scale_model.year }}</td>
                         <td>{{ scale_model.scale }}</td>
                         <td>{{ scale_model.brand }}</td>
+                        <td> {{ prices.get(scale_model.id).get("min_price") }}</td>
+                        <td> {{ prices.get(scale_model.id).get("max_price") }}</td>
                         <td>
                             <a href={{ url_for('get_all_ads_by_scale_model_id', scale_model_id = scale_model.id) }}> ссылка</a>
                         </td>

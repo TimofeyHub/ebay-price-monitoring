@@ -31,7 +31,3 @@ class ScaleModel(Base):
         secondary=collection_and_scale_model_association,
         back_populates="scale_models",
     )
-    # wishlists: Mapped[List["Wishlist"]] = relationship(
-    #     secondary=wishlist_and_scale_model_association,
-    #     back_populates="scale_models",
-    # )

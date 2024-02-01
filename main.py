@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-
 import uvicorn
 
 from core.config import settings, TEMPLATES

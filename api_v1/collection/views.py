@@ -8,6 +8,7 @@ from api_v1.scale_model.schemas import (
     ScaleModelCreateSchema,
 )
 from api_v1.scale_model.views import get_scale_model_by_id
+from api_v1.scale_model.crud import get_min_max_prices_by_scale_model_id
 from core.config import TEMPLATES, settings
 from core.models import db_helper
 from . import crud
@@ -29,12 +30,19 @@ async def get_all_scale_models_by_collection_id(
         session=session,
         collection_id=TEST_COLLECTION_ID,
     )
+    scale_model_id_list = [scale_model.id for scale_model in scale_list]
+
+    prices = await get_min_max_prices_by_scale_model_id(
+        session=session,
+        scale_model_id_list=scale_model_id_list,
+    )
 
     return TEMPLATES.TemplateResponse(
         name="collection.html",
         context={
             "request": request,
             "scale_list": scale_list,
+            "prices": prices,
         },
     )
 
@@ -77,7 +85,7 @@ async def add_scale_model_in_collection(
     )
 
 
-@router.patch("/update_all/")
+@router.post("/update_all/")
 async def update_all_collection(
     # collection_id: int = TEST_COLLECTION_ID,
     session: AsyncSession = Depends(db_helper.session_dependency),
