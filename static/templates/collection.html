@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
     {% if scale_list %}
+        <img src="{{graph_image_path}}" alt="график изменения цены модели">
+        <h4>Цена коллекции:</h4>
+        <p>Минимальная цена: {{ collection_price.min_price }} руб.</p>
+        <p>Максимальная цена: {{ collection_price.max_price }} руб.</p>
         <table id="collection_table" border="2">
             <thead>
             <tr>

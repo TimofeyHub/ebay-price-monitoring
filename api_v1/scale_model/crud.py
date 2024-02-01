@@ -1,7 +1,6 @@
 import datetime
-from typing import Dict
 
-from sqlalchemy import select, desc, func, update
+from sqlalchemy import select, desc, func
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload

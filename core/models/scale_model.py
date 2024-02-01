@@ -1,17 +1,14 @@
-from typing import List, TYPE_CHECKING, Optional
+from typing import List, TYPE_CHECKING
 
-from sqlalchemy import String, Integer, ForeignKey
+from sqlalchemy import String, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 from .collection_and_scale_model import collection_and_scale_model_association
-from .scale_model_and_ad import scale_model_and_ad_association
-from .wishlist_and_scale_model import wishlist_and_scale_model_association
 
 if TYPE_CHECKING:
     from .sold_ad import SoldAd
     from .collection import Collection
-    from .wishlist import Wishlist
 
 
 class ScaleModel(Base):

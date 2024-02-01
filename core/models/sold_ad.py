@@ -5,7 +5,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import expression
 
 from .base import Base
-from .scale_model_and_ad import scale_model_and_ad_association
 
 if TYPE_CHECKING:
     from .scale_model import ScaleModel

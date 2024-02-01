@@ -1,13 +1,11 @@
-from typing import List, TYPE_CHECKING, Optional
+from typing import List, TYPE_CHECKING
 
-from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 from .collection_and_scale_model import collection_and_scale_model_association
 
 if TYPE_CHECKING:
-    from .user import User
     from .scale_model import ScaleModel
 
 

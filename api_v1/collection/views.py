@@ -4,15 +4,19 @@ from fastapi import APIRouter, Depends, Request, Form, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api_v1.scale_model.crud import get_min_max_prices_by_scale_model_id
 from api_v1.scale_model.schemas import (
     ScaleModelCreateSchema,
 )
 from api_v1.scale_model.views import get_scale_model_by_id
-from api_v1.scale_model.crud import get_min_max_prices_by_scale_model_id
 from core.config import TEMPLATES, settings
 from core.models import db_helper
+from core.price_visualization import build_collection_price_graph
 from . import crud
-from .collection_price.crud import calculate_collection_price_by_collection_id
+from .collection_price.crud import (
+    calculate_price_by_collection_id,
+    get_all_prices_by_collection_id,
+)
 
 TEST_COLLECTION_ID = 1
 
@@ -37,12 +41,28 @@ async def get_all_scale_models_by_collection_id(
         scale_model_id_list=scale_model_id_list,
     )
 
+    collection_price = await calculate_price_by_collection_id(
+        session=session,
+        collection_id=TEST_COLLECTION_ID,
+    )
+
+    collection_price_list = await get_all_prices_by_collection_id(
+        session=session,
+        collection_id=TEST_COLLECTION_ID,
+    )
+    graph_image_path = await build_collection_price_graph(
+        collection_id=TEST_COLLECTION_ID,
+        collection_price_list=collection_price_list,
+    )
+
     return TEMPLATES.TemplateResponse(
         name="collection.html",
         context={
             "request": request,
             "scale_list": scale_list,
             "prices": prices,
+            "collection_price": collection_price,
+            "graph_image_path": graph_image_path,
         },
     )
 
@@ -121,14 +141,3 @@ async def delete_scale_model_from_collection_by_id(
             url=f"{settings.api_v1_prefix}/collection/",
             status_code=status.HTTP_302_FOUND,
         )
-
-
-@router.get("/price/")
-async def get_collection_price(
-    # collection_id=TEST_COLLECTION_ID,
-    session: AsyncSession = Depends(db_helper.session_dependency),
-):
-    await calculate_collection_price_by_collection_id(
-        session=session,
-        collection_id=TEST_COLLECTION_ID,
-    )
