@@ -20,7 +20,7 @@
                     <a href="{{ ad.ebay_link }}"> ссылка </a>
                 </td>
                 <td>
-                    <a href="{{ url_for('delete_sold_ad_by_id', sold_ad_id=ad.id) }}">
+                    <a href="{{ url_for('exclude_sold_ad_from_price_calculation_by_id', sold_ad_id=ad.id) }}">
                         удалить
                     </a>
                 </td>

@@ -2,6 +2,7 @@ from fastapi import APIRouter, status, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api_v1.sold_ad.schemas import SoldAdSchema
+from api_v1.sold_ad import crud
 from core.config import TEMPLATES
 from core.models import db_helper, ScaleModel
 from core.price_visualization import build_scale_model_price_graph
@@ -64,12 +65,12 @@ async def delete_scale_model(
 
 @router.patch("/{scale_model_id}/update_ads/")
 async def update_ads_by_scale_model_id(
-    scale_model_id: int,
+    scale_model: ScaleModel = Depends(get_scale_model_by_id),
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    return await crud.update_ads_by_scale_model_id(
+    return await crud.find_sold_ad_on_ebay(
         session=session,
-        scale_model_id=scale_model_id,
+        scale_model_id=scale_model.id,
     )
 
 

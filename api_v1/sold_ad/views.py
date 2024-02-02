@@ -58,21 +58,21 @@ async def update_sold_ad(
     status_code=status.HTTP_204_NO_CONTENT,
     methods=["GET", "POST"],
 )
-async def delete_sold_ad_by_id(
+async def exclude_sold_ad_from_price_calculation_by_id(
     request: Request,
     sold_ad: SoldAd = Depends(get_sold_ad_by_id),
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     if request.method == "GET":
         return TEMPLATES.TemplateResponse(
-            name="ad_delete_confirmation.html",
+            name="sold_ad_delete_confirmation.html",
             context={
                 "request": request,
                 "sold_ad": sold_ad,
             },
         )
     else:
-        await crud.delete_sold_ad(
+        await crud.exclude_sold_ad_from_price_calculation(
             session=session,
             sold_ad=sold_ad,
         )

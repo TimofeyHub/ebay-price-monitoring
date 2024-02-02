@@ -1,5 +1,3 @@
-from typing import Dict
-
 from sqlalchemy import select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,10 +6,11 @@ from sqlalchemy.orm import selectinload
 from api_v1.scale_model.crud import (
     create_scale_model,
     get_scale_model,
-    update_ads_by_scale_model_id,
 )
 from api_v1.scale_model.schemas import ScaleModelCreateSchema
+from api_v1.sold_ad.crud import find_sold_ad_on_ebay
 from core.models import ScaleModel, Collection
+from api_v1.collection.collection_price.crud import calculate_price_by_collection_id
 
 
 async def add_scale_model_in_collection(
@@ -56,7 +55,7 @@ async def add_scale_model_in_collection(
             .where(ScaleModel.id == new_scale_model.id)
             .options(selectinload(ScaleModel.sold_ads))
         )
-        await update_ads_by_scale_model_id(
+        await find_sold_ad_on_ebay(
             session=session,
             scale_model_id=model_for_adding_ads.id,
         )
@@ -89,7 +88,13 @@ async def update_all_collection(
     collection = result.scalars().first()
 
     for model in collection.scale_models:
-        await update_ads_by_scale_model_id(session=session, scale_model_id=model.id)
+        await find_sold_ad_on_ebay(session=session, scale_model_id=model.id)
+
+    await calculate_price_by_collection_id(
+        session=session,
+        collection_id=collection_id,
+        force_calculation=True,
+    )
 
 
 async def delete_scale_model_from_collection_by_id(

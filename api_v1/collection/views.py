@@ -110,9 +110,13 @@ async def update_all_collection(
     # collection_id: int = TEST_COLLECTION_ID,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    return await crud.update_all_collection(
+    await crud.update_all_collection(
         session=session,
         collection_id=TEST_COLLECTION_ID,
+    )
+    return RedirectResponse(
+        url=f"{settings.api_v1_prefix}/collection/",
+        status_code=status.HTTP_302_FOUND,
     )
 
 

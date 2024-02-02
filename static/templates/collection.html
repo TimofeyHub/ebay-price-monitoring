@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
     {% if scale_list %}
+        <form method="post" action="{{ url_for('update_all_collection') }}">
+        <button type="submit" class="btn btn-primary" value="Submit">Обновить коллекцию</button>
+    </form>
         <img src="{{graph_image_path}}" alt="график изменения цены модели">
         <h4>Цена коллекции:</h4>
         <p>Минимальная цена: {{ collection_price.min_price }} руб.</p>

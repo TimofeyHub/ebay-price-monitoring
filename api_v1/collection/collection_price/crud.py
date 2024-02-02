@@ -46,9 +46,6 @@ async def calculate_price_by_collection_id(
     )
     last_calc_result = await session.execute(stmt_last_calc)
     last_calc = last_calc_result.scalars().first()
-    print(last_calc.min_price)
-    if last_calc:
-        return last_calc
 
     if force_calculation or not last_calc:
         get_scale_model_id = (
@@ -69,6 +66,7 @@ async def calculate_price_by_collection_id(
                     - datetime.timedelta(days=calculate_interval),
                     datetime.datetime.utcnow(),
                 ),
+                SoldAd.include_in_calculation.is_(True),
             )
             .group_by(SoldAd.scale_model_id)
         ).subquery()
@@ -87,3 +85,5 @@ async def calculate_price_by_collection_id(
                 max_price=min_max_prices[1],
             ),
         )
+    else:
+        return last_calc
