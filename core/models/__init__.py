@@ -8,6 +8,7 @@ __all__ = [
     "Collection",
     "collection_and_scale_model_association",
     "CollectionPrice",
+    "User",
 ]
 
 from .base import Base
@@ -18,3 +19,4 @@ from .db_helper import DatabaseHelper, db_helper
 from .scale_model import ScaleModel
 from .scale_model_and_ad import scale_model_and_ad_association
 from .sold_ad import SoldAd
+from .user import User

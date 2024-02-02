@@ -10,9 +10,10 @@ from api_v1.scale_model.schemas import (
 )
 from api_v1.scale_model.views import get_scale_model_by_id
 from core.config import TEMPLATES, settings
-from core.models import db_helper
+from core.models import db_helper, Collection
 from core.price_visualization import build_collection_price_graph
 from . import crud
+from .dependecies import get_collection_by_id
 from .collection_price.crud import (
     calculate_price_by_collection_id,
     get_all_prices_by_collection_id,
@@ -24,41 +25,47 @@ TEST_COLLECTION_ID = 1
 router = APIRouter(tags=["collection"])
 
 
-@router.get("/")
+@router.get("/{collection_id}")
 async def get_all_scale_models_by_collection_id(
     request: Request,
     session: AsyncSession = Depends(db_helper.session_dependency),
-    # collection_id: int = TEST_COLLECTION_ID,
+    collection: Collection = Depends(get_collection_by_id),
 ):
+    prices = None
+    collection_price = None
+    graph_image_path = None
+
     scale_list = await crud.get_all_scale_models_by_collection_id(
         session=session,
-        collection_id=TEST_COLLECTION_ID,
+        collection_id=collection.id,
     )
-    scale_model_id_list = [scale_model.id for scale_model in scale_list]
+    if scale_list:
+        scale_model_id_list = [scale_model.id for scale_model in scale_list]
 
-    prices = await get_min_max_prices_by_scale_model_id(
-        session=session,
-        scale_model_id_list=scale_model_id_list,
-    )
+        prices = await get_min_max_prices_by_scale_model_id(
+            session=session,
+            scale_model_id_list=scale_model_id_list,
+        )
 
-    collection_price = await calculate_price_by_collection_id(
-        session=session,
-        collection_id=TEST_COLLECTION_ID,
-    )
+        collection_price = await calculate_price_by_collection_id(
+            session=session,
+            collection_id=collection.id,
+        )
 
-    collection_price_list = await get_all_prices_by_collection_id(
-        session=session,
-        collection_id=TEST_COLLECTION_ID,
-    )
-    graph_image_path = await build_collection_price_graph(
-        collection_id=TEST_COLLECTION_ID,
-        collection_price_list=collection_price_list,
-    )
+        collection_price_list = await get_all_prices_by_collection_id(
+            session=session,
+            collection_id=collection.id,
+        )
+        graph_image_path = await build_collection_price_graph(
+            collection_id=collection.id,
+            collection_price_list=collection_price_list,
+        )
 
     return TEMPLATES.TemplateResponse(
         name="collection.html",
         context={
             "request": request,
+            "collection": collection,
             "scale_list": scale_list,
             "prices": prices,
             "collection_price": collection_price,

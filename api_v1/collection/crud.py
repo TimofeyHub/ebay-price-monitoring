@@ -7,10 +7,32 @@ from api_v1.scale_model.crud import (
     create_scale_model,
     get_scale_model,
 )
+
 from api_v1.scale_model.schemas import ScaleModelCreateSchema
 from api_v1.sold_ad.crud import find_sold_ad_on_ebay
-from core.models import ScaleModel, Collection
+from core.models import ScaleModel, Collection, User
 from api_v1.collection.collection_price.crud import calculate_price_by_collection_id
+
+
+async def get_collection_by_id(
+    session: AsyncSession,
+    collection_id: int,
+) -> Collection | None:
+    return await session.get(Collection, collection_id)
+
+
+async def create_new_collection(
+    session: AsyncSession,
+    user: User,
+):
+    new_collection = Collection(
+        user_id=user.id,
+        user=user,
+    )
+    session.add(new_collection)
+
+    await session.commit()
+    return new_collection
 
 
 async def add_scale_model_in_collection(
@@ -20,13 +42,13 @@ async def add_scale_model_in_collection(
     activate_ebay_search: bool,
 ) -> None:
     # Временная конструкция для тестирования функции
-    stmt = select(Collection).where(Collection.id == collection_id)
-    result: Result = await session.execute(stmt)
-    collection = result.scalars().first()
-    print(collection)
-    if not collection:
-        session.add(Collection())
-        await session.commit()
+    # stmt = select(Collection).where(Collection.id == collection_id)
+    # result: Result = await session.execute(stmt)
+    # collection = result.scalars().first()
+    # print(collection)
+    # if not collection:
+    #     session.add(Collection())
+    #     await session.commit()
     collection = await session.scalar(
         select(Collection)
         .where(Collection.id == collection_id)
