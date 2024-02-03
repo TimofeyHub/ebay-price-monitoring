@@ -39,6 +39,6 @@ async def user_registration(
     )
 
     return RedirectResponse(
-        url=f"{settings.api_v1_prefix}/collection/{new_user.c}",
+        url=f"{settings.api_v1_prefix}/collection/{new_user.collection.id}",
         status_code=status.HTTP_302_FOUND,
     )

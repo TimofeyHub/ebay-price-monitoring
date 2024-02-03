@@ -2,7 +2,7 @@ import bcrypt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import User
-from .schemas import CreateUserSchema
+from .schemas import CreateUserSchema, UserBaseSchema
 
 from api_v1.collection.crud import create_new_collection
 

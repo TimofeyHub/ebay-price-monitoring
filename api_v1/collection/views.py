@@ -25,7 +25,7 @@ TEST_COLLECTION_ID = 1
 router = APIRouter(tags=["collection"])
 
 
-@router.get("/{collection_id}")
+@router.get("/{collection_id}/")
 async def get_all_scale_models_by_collection_id(
     request: Request,
     session: AsyncSession = Depends(db_helper.session_dependency),
