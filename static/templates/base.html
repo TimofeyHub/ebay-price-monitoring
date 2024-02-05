@@ -29,20 +29,28 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-            {% if auth_user %}
-            <li class="nav-item active">
-                <a class="nav-link" href={{ url_for('get_all_scale_models_by_collection_id') }}> Моя коллекция </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href={{ url_for('add_scale_model_in_collection') }}> Добавить модель </a>
-            </li>
+            {% if user %}
+                <li class="nav-item active">
+                    <a class="nav-link"
+                       href={{ url_for('get_all_scale_models_by_collection_id', collection_id = user.collection.id) }}>
+                        Моя коллекция </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link"
+                       href={{ url_for('add_scale_model_in_collection',  collection_id = user.collection.id) }}>
+                        Добавить модель </a>
+                </li>
+                <li>
+                    <a class="nav-link"
+                       href={{ url_for('logout')}}>Выход </a>
+                </li>
             {% else %}
-            <li class="nav-item active">
-                <a class="nav-link" href={{ url_for('user_registration') }}> Регистрация </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href={{ url_for('user_login') }}> Вход </a>
-            </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href={{ url_for('user_registration') }}> Регистрация </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href={{ url_for('user_login') }}> Вход </a>
+                </li>
             {% endif %}
         </ul>
     </div>

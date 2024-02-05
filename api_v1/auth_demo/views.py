@@ -12,20 +12,22 @@ from fastapi import (
     Response,
     Cookie,
 )
+from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from api_v1.cookie import (
     create_cookie,
     delete_cookie,
-    get_cookie_by_session_id,
     CreateCookieInfoSchema,
 )
-from core.config import TEMPLATES
+from core.config import TEMPLATES, settings
 from core.models import db_helper, User, CookieInfo
+from .config import COOKIE_SESSION_ID_KEY
+from .session_data import get_cookie_data
 
 router = APIRouter(tags=["Auth Demo"])
-COOKIE_SESSION_ID_KEY = "web-app-session-id"
 
 
 @router.get(path="/login/")
@@ -42,17 +44,6 @@ async def generate_session_id() -> str:
     return uuid.uuid4().hex
 
 
-async def get_session_data(
-    session: AsyncSession = Depends(db_helper.session_dependency),
-    session_id: str = Cookie(alias=COOKIE_SESSION_ID_KEY),
-) -> CookieInfo | None:
-    session_info = await get_cookie_by_session_id(
-        session=session,
-        session_id=session_id,
-    )
-    return session_info
-
-
 @router.post(path="/login/")
 async def user_login(
     response: Response,
@@ -60,9 +51,11 @@ async def user_login(
     password: Annotated[str, Form()],
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    stmt = select(User).where(User.email == email)
+    stmt = (
+        select(User).options(selectinload(User.collection)).where(User.email == email)
+    )
     user_result = await session.execute(stmt)
-    user = user_result.scalars().first()
+    user = user_result.scalars().one_or_none()
 
     if user:
         check = bcrypt.checkpw(
@@ -78,7 +71,12 @@ async def user_login(
                     user_id=user.id,
                 ),
             )
-            response.set_cookie(COOKIE_SESSION_ID_KEY, session_id)
+            redirect_response = RedirectResponse(
+                url=f"{settings.api_v1_prefix}/collection/{user.collection.id}/",
+                status_code=status.HTTP_302_FOUND,
+            )
+            redirect_response.set_cookie(COOKIE_SESSION_ID_KEY, session_id)
+            return redirect_response
         else:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -93,7 +91,7 @@ async def user_login(
 
 @router.get("/check-cookie/")
 async def check_cookie(
-    session_info: CookieInfo = Depends(get_session_data),
+    session_info: CookieInfo = Depends(get_cookie_data),
 ):
     if session_info:
         return session_info
@@ -106,10 +104,15 @@ async def logout(
     response: Response,
     session: AsyncSession = Depends(db_helper.session_dependency),
     session_id: str = Cookie(alias=COOKIE_SESSION_ID_KEY),
-    session_info: CookieInfo = Depends(get_session_data),
+    session_info: CookieInfo = Depends(get_cookie_data),
 ):
     response.delete_cookie(session_id)
     await delete_cookie(
         session=session,
         cookie=session_info,
+    )
+
+    return RedirectResponse(
+        url=f"/",
+        status_code=status.HTTP_308_PERMANENT_REDIRECT,
     )

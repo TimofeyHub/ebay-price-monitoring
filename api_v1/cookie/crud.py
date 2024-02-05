@@ -1,8 +1,9 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from .schemas import CreateCookieInfoSchema
 
-from core.models import CookieInfo
+from core.models import CookieInfo, User
 
 
 async def create_cookie(

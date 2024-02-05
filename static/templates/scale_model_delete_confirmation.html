@@ -9,5 +9,5 @@
         <button type="submit" class="btn btn-danger" value="Submit">Да</button>
     </form>
     <br>
-    <a class="btn btn-primary" href="{{ url_for('get_all_scale_models_by_collection_id') }}" role="button">Вернуться в коллекцию</a>
+    <a class="btn btn-primary" href="{{ url_for('get_all_scale_models_by_collection_id',collection_id = user.collection.id) }}" role="button">Вернуться в коллекцию</a>
 {% endblock %}

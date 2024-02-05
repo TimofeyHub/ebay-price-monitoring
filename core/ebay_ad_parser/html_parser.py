@@ -13,6 +13,7 @@ def ebay_ad_date_to_datetime(raw_date: str) -> datetime:
     locale.setlocale(locale.LC_TIME, "ru_RU.UTF-8")
     # Название ноября в ebay и питоне не совпадает
     raw_date = raw_date.replace("нояб.", "ноя.")
+    raw_date = raw_date.replace("февр.", "фев.")
     sold_date = datetime.strptime(raw_date, date_format)
     return sold_date
 
@@ -58,7 +59,7 @@ async def get_sold_ebay_ad(
                 )
                 price = round(float(price))
 
-                ru_date_pattern = r"\b\d{1,2}\s(?:янв|фев|мар|апр|май|июн|июл|авг|сен|окт|нояб|дек)\.\s\d{4}\b"
+                ru_date_pattern = r"\b\d{1,2}\s(?:янв|февр|мар|апр|май|июн|июл|авг|сен|окт|нояб|дек)\.\s\d{4}\b"
                 raw_date = str(ad_base_soup.find("span", class_="POSITIVE"))
                 print(raw_date)
                 sold_date = re.findall(ru_date_pattern, raw_date, flags=re.IGNORECASE)[

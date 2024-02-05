@@ -2,8 +2,9 @@ from fastapi import APIRouter, status, Depends, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api_v1.auth_demo import get_user_by_cookie
 from core.config import TEMPLATES, settings
-from core.models import db_helper, SoldAd
+from core.models import db_helper, SoldAd, User
 from . import crud
 from .dependecies import get_sold_ad_by_id
 from .schemas import SoldAdSchema, SoldAdCreateSchema, SoldAdUpdateSchema
@@ -26,6 +27,7 @@ async def get_all_sold_ads(
 async def create_sold_ad(
     sold_ad_info: SoldAdCreateSchema,
     session: AsyncSession = Depends(db_helper.session_dependency),
+    user: User = Depends(get_user_by_cookie),
 ):
     return await crud.create_sold_ad(
         session=session,
@@ -36,6 +38,7 @@ async def create_sold_ad(
 @router.get("/{sold_ad_id}/", response_model=SoldAdSchema)
 async def get_sold_ad(
     sold_ad: SoldAd = Depends(get_sold_ad_by_id),
+    user: User = Depends(get_user_by_cookie),
 ):
     return sold_ad
 
@@ -45,6 +48,7 @@ async def update_sold_ad(
     sold_ad_update: SoldAdUpdateSchema,
     sold_ad: SoldAd = Depends(get_sold_ad_by_id),
     session: AsyncSession = Depends(db_helper.session_dependency),
+    user: User = Depends(get_user_by_cookie),
 ):
     return await crud.update_sold_ad(
         session=session,
@@ -62,6 +66,7 @@ async def exclude_sold_ad_from_price_calculation_by_id(
     request: Request,
     sold_ad: SoldAd = Depends(get_sold_ad_by_id),
     session: AsyncSession = Depends(db_helper.session_dependency),
+    user: User = Depends(get_user_by_cookie),
 ):
     if request.method == "GET":
         return TEMPLATES.TemplateResponse(

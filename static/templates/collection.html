@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
     {% if scale_list %}
-        <form method="post" action="{{ url_for('update_all_collection') }}">
+        <form method="post" action="{{ url_for('update_all_collection',  collection_id = user.collection.id) }}">
         <button type="submit" class="btn btn-primary" value="Submit">Обновить коллекцию</button>
     </form>
         <img src="{{graph_image_path}}" alt="график изменения цены модели">
@@ -34,7 +34,7 @@
                             <a href={{ url_for('get_all_ads_by_scale_model_id', scale_model_id = scale_model.id) }}> ссылка</a>
                         </td>
                         <td>
-                            <a  href="{{ url_for('delete_scale_model_from_collection_by_id', scale_model_id = scale_model.id )}}" > удалить из
+                            <a  href="{{ url_for('delete_scale_model_from_collection_by_id', scale_model_id = scale_model.id, collection_id = user.collection.id )}}" > удалить из
                                 коллекции</a>
                         </td>
                     </tr>

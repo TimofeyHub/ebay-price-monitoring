@@ -3,8 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from api_v1.sold_ad.schemas import SoldAdSchema
 from api_v1.sold_ad import crud
+from api_v1.auth_demo import get_user_by_cookie
 from core.config import TEMPLATES
-from core.models import db_helper, ScaleModel
+from core.models import db_helper, ScaleModel, User
 from core.price_visualization import build_scale_model_price_graph
 from . import crud
 from .dependecies import get_scale_model_by_id
@@ -16,6 +17,7 @@ router = APIRouter(tags=["ScaleModel"])
 @router.get("/", response_model=list[ScaleModelSchema])
 async def get_all_scale_models(
     session: AsyncSession = Depends(db_helper.session_dependency),
+    user: User = Depends(get_user_by_cookie),
 ):
     return await crud.get_all_scale_models(session=session)
 
@@ -28,6 +30,7 @@ async def get_all_scale_models(
 async def create_scale_model(
     scale_model_info: ScaleModelCreateSchema,
     session: AsyncSession = Depends(db_helper.session_dependency),
+    user: User = Depends(get_user_by_cookie),
 ):
     return await crud.create_scale_model(
         session=session,
@@ -38,6 +41,7 @@ async def create_scale_model(
 @router.get("/{scale_model_id}/", response_model=ScaleModelSchema)
 async def get_scale_model(
     scale_model: ScaleModel = Depends(get_scale_model_by_id),
+    user: User = Depends(get_user_by_cookie),
 ):
     return scale_model
 
@@ -47,6 +51,7 @@ async def update_scale_model(
     scale_model_update: ScaleModelUpdateSchema,
     scale_model: ScaleModel = Depends(get_scale_model_by_id),
     session: AsyncSession = Depends(db_helper.session_dependency),
+    user: User = Depends(get_user_by_cookie),
 ):
     return await crud.update_scale_model(
         session=session,
@@ -59,6 +64,7 @@ async def update_scale_model(
 async def delete_scale_model(
     scale_model: ScaleModel = Depends(get_scale_model_by_id),
     session: AsyncSession = Depends(db_helper.session_dependency),
+    user: User = Depends(get_user_by_cookie),
 ) -> None:
     await crud.delete_scale_model(session=session, scale_model=scale_model)
 
@@ -67,6 +73,7 @@ async def delete_scale_model(
 async def update_ads_by_scale_model_id(
     scale_model: ScaleModel = Depends(get_scale_model_by_id),
     session: AsyncSession = Depends(db_helper.session_dependency),
+    user: User = Depends(get_user_by_cookie),
 ):
     return await crud.find_sold_ad_on_ebay(
         session=session,
@@ -79,6 +86,7 @@ async def get_all_ads_by_scale_model_id(
     request: Request,
     scale_model: ScaleModel = Depends(get_scale_model_by_id),
     session: AsyncSession = Depends(db_helper.session_dependency),
+    user: User = Depends(get_user_by_cookie),
 ):
     ads_list = await crud.get_all_ads_by_scale_model_id(
         session=session,
@@ -97,5 +105,6 @@ async def get_all_ads_by_scale_model_id(
             "scale_model": scale_model,
             "ads_list": ads_list,
             "graph_image_path": graph_image_path,
+            "user": user,
         },
     )
