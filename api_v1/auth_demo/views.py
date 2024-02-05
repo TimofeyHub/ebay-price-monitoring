@@ -33,7 +33,7 @@ async def user_login(
     request: Request,
 ):
     return TEMPLATES.TemplateResponse(
-        name="registration_form.html",
+        name="login_form.html",
         request=request,
     )
 
