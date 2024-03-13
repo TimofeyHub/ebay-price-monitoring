@@ -5,15 +5,21 @@
         <div class="form-group">
             <label for="exampleInputEmail1">Электронная почта</label>
             <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-                   placeholder="Enter email" style="width: 350px" required>
+                   placeholder="Введите почту" style="width: 350px" required>
         </div>
         <br>
         <div class="form-group">
             <label for="exampleInputPassword1">Пароль</label>
             <input name="password" type="password" class="form-control" id="exampleInputPassword1"
-                   placeholder="Password" style="width: 350px" required>
+                   placeholder="Введите пароль" style="width: 350px" required>
         </div>
         <br>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <div class="form-group">
+            <label for="UserAboutInfo">О себе</label>
+            <input name="about" type="text" class="form-control" id="UserAboutInfo" style="width: 350px"
+                   placeholder="Введите информацию о себе ">
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Регистрация</button>
     </form>
 {% endblock %}

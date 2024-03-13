@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, desc
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import func
@@ -32,18 +32,24 @@ async def create_collection_price(
 async def calculate_price_by_collection_id(
     session: AsyncSession,
     collection_id: int,
-    calculate_interval: int = 90,
+    calculate_interval: int = 360,
     force_calculation: bool = False,
     calculation_lifespan=1,
 ) -> CollectionPrice:
     # Смотрим, считалась ли цена за последние сутки
-    stmt_last_calc = select(CollectionPrice).where(
-        CollectionPrice.id == collection_id,
-        CollectionPrice.update_date.between(
-            datetime.datetime.utcnow() - datetime.timedelta(days=calculation_lifespan),
-            datetime.datetime.utcnow(),
-        ),
+    stmt_last_calc = (
+        select(CollectionPrice)
+        .where(
+            CollectionPrice.id_collection == collection_id,
+            CollectionPrice.update_date.between(
+                datetime.datetime.utcnow()
+                - datetime.timedelta(days=calculation_lifespan),
+                datetime.datetime.utcnow(),
+            ),
+        )
+        .order_by(desc(CollectionPrice.update_date))
     )
+
     last_calc_result = await session.execute(stmt_last_calc)
     last_calc = last_calc_result.scalars().first()
 

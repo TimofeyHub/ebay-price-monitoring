@@ -3,27 +3,30 @@
 <form method="post">
   <div class="form-group">
     <label for="SearchFormKeywords">Ключевые слова</label>
-    <input name="keywords" type="text" class="form-control" id="SearchFormKeywords" placeholder="Например, 'bottas australian gp' ">
+    <input name="keywords" type="text" class="form-control" id="SearchFormKeywords"
+           placeholder="Например, 'bottas australian gp'" style="width: 350px">
   </div>
   <div class="form-group">
     <label for="SearchFormYear">Год</label>
-    <input name="year" type="text" class="form-control" id="SearchFormYear" placeholder="Год гран-при / года участия пилота">
+    <input name="year" type="text" class="form-control" id="SearchFormYear"
+           placeholder="Год гран-при / года участия пилота" style="width: 350px">
   </div>
   <div class="form-row">
     <div class="form-group col-md-4">
       <label for="SearchFormScale">Масштаб</label>
-      <select name="scale" id="SearchFormScale" class="form-control">
+      <select name="scale" id="SearchFormScale" class="form-control" style="width: 350px">
         <option selected>43</option>
         <option>18</option>
       </select>
     </div>
       <div class="form-group col-md-4">
       <label for="SearchFormBrand">Производитель</label>
-      <select name="brand" id="SearchFormBrand" class="form-control">
+      <select name="brand" id="SearchFormBrand" class="form-control" style="width: 350px">
         <option selected>MINICHAMPS</option>
         <option>Spark</option>
       </select>
     </div>
+      <br>
     <div class="form-group col-md-2">
       <label for="SearchFormUrl">URL с результатами поиска c Ebay</label>
       <input name="search_url_created_by_user" type="text" class="form-control" id="SearchFormUrl">

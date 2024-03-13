@@ -106,13 +106,14 @@ async def logout(
     session_id: str = Cookie(alias=COOKIE_SESSION_ID_KEY),
     session_info: CookieInfo = Depends(get_cookie_data),
 ):
+    redirect = RedirectResponse(
+        url=f"/",
+        status_code=status.HTTP_308_PERMANENT_REDIRECT,
+    )
     response.delete_cookie(session_id)
     await delete_cookie(
         session=session,
         cookie=session_info,
     )
 
-    return RedirectResponse(
-        url=f"/",
-        status_code=status.HTTP_308_PERMANENT_REDIRECT,
-    )
+    return redirect

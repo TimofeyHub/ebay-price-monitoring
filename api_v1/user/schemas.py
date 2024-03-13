@@ -7,6 +7,7 @@ from pydantic import BaseModel
 class UserBaseSchema(BaseModel):
     email: str
     password: str
+    about: str
 
 
 class UserSchema(UserBaseSchema):
@@ -16,3 +17,4 @@ class UserSchema(UserBaseSchema):
 class CreateUserSchema(UserBaseSchema):
     email: Annotated[str, Form()]
     password: Annotated[str, Form()]
+    about: Annotated[str | None, Form()] = None

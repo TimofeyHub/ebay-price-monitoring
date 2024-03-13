@@ -27,18 +27,20 @@ async def user_registration(
 async def user_registration(
     email: Annotated[str, Form()],
     password: Annotated[str, Form()],
+    about: Annotated[str | None, Form()] = None,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     new_user_info = CreateUserSchema(
         email=email,
         password=password,
+        about=about,
     )
-    new_user = await create_new_user(
+    await create_new_user(
         session=session,
         user_info=new_user_info,
     )
 
     return RedirectResponse(
-        url=f"{settings.api_v1_prefix}/collection/{new_user.collection.id}",
-        status_code=status.HTTP_302_FOUND,
+        url=f"/",
+        status_code=status.HTTP_201_CREATED,
     )

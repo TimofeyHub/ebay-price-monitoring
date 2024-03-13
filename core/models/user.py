@@ -16,5 +16,6 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(100), unique=True)
     password: Mapped[str] = mapped_column(String(255))
+    about: Mapped[str] = mapped_column(String(255), nullable=True)
     collection: Mapped["Collection"] = relationship(back_populates="user")
     cookies: Mapped[List["CookieInfo"]] = relationship(back_populates="user")

@@ -101,6 +101,7 @@ async def add_scale_model_in_collection(
     brand: Annotated[str, Form()],
     search_url_created_by_user: Annotated[str | None, Form()] = None,
     session: AsyncSession = Depends(db_helper.session_dependency),
+    collection: Collection = Depends(get_collection_by_id),
     user: User = Depends(get_user_by_cookie),
 ):
     scale_info = ScaleModelCreateSchema(
@@ -113,7 +114,7 @@ async def add_scale_model_in_collection(
     await crud.add_scale_model_in_collection(
         session=session,
         scale_model_info=scale_info,
-        collection_id=TEST_COLLECTION_ID,
+        collection_id=collection.id,
         activate_ebay_search=True,
     )
     return RedirectResponse(
@@ -125,11 +126,12 @@ async def add_scale_model_in_collection(
 @router.post("/{collection_id}/update_all/")
 async def update_all_collection(
     session: AsyncSession = Depends(db_helper.session_dependency),
+    collection: Collection = Depends(get_collection_by_id),
     user: User = Depends(get_user_by_cookie),
 ):
     await crud.update_all_collection(
         session=session,
-        collection_id=TEST_COLLECTION_ID,
+        collection_id=collection.id,
     )
     return RedirectResponse(
         url=f"{settings.api_v1_prefix}/collection/{user.collection.id}/",
@@ -144,6 +146,7 @@ async def delete_scale_model_from_collection_by_id(
     request: Request,
     scale_model=Depends(get_scale_model_by_id),
     session: AsyncSession = Depends(db_helper.session_dependency),
+    collection: Collection = Depends(get_collection_by_id),
     user: User = Depends(get_user_by_cookie),
 ):
     if request.method == "GET":
@@ -157,7 +160,7 @@ async def delete_scale_model_from_collection_by_id(
         )
     else:
         await crud.delete_scale_model_from_collection_by_id(
-            collection_id=TEST_COLLECTION_ID,
+            collection_id=collection.id,
             scale_model_id=scale_model.id,
             session=session,
         )

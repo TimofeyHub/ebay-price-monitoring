@@ -71,7 +71,7 @@ async def get_all_ads_by_scale_model_id(
 async def get_min_max_prices_by_scale_model_id(
     session: AsyncSession,
     scale_model_id_list: list[int],
-    calculation_interval_in_days: int = 90,
+    calculation_interval_in_days: int = 180,
 ):
     stmt = (
         select(ScaleModel.id, func.min(SoldAd.price), func.max(SoldAd.price))
